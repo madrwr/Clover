@@ -6,11 +6,6 @@ local Camera = workspace.CurrentCamera
 
 local ChatModule = {}
 
-
-local ChatFrameOBJV = Instance.new("ObjectValue", script)
-
-
-
 function GetModule(Path)
 	local MainPath = "https://raw.githubusercontent.com/madrwr/Clover"
 	local Module =  loadstring(game:HttpGetAsync(MainPath.. Path.. ".lua"))()
@@ -21,7 +16,7 @@ end
 
 function ChatModule.New(self)
 	local Chat = require(Players.LocalPlayer:WaitForChild("PlayerScripts"):WaitForChild("ChatScript"):WaitForChild("ChatMain"))
-	local Keyboard = GetModule(nil)
+	local Keyboard = GetModule("ChatModules/KeyBoard")
 	
 	
 	function self:NewGui()
@@ -47,18 +42,9 @@ function ChatModule.New(self)
 	end
 	
 	function self:MoveChat(Parent)
-		local ChatFrame:Frame
-		
-		if self.ChatFrameOBJV and self.ChatFrameOBJV.Value then
-			ChatFrame = self.ChatFrameOBJV.Value
-		else
-			local ChatWindow = Players.LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("Chat")
-			while #ChatWindow:GetChildren() == 0 do wait() end
-			ChatFrame = ChatWindow:FindFirstChildOfClass("Frame")
-		end
-		
-		
-		self.PreviousChatSize = ChatFrame.Size
+		local ChatWindow = Players.LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("Chat")
+		while #ChatWindow:GetChildren() == 0 do wait() end
+		local ChatFrame = ChatWindow:FindFirstChildOfClass("Frame")
 		ChatFrame.Size = UDim2.new(1,0,1,0)
 		ChatFrame.Parent = Parent
 		ChatFrame.Active = false
@@ -68,15 +54,12 @@ function ChatModule.New(self)
 				Thing.Active = false
 			end)
 		end
-		
-		ChatFrameOBJV.Value = ChatFrame
 	end
 	
 	function self:NewChatParent(Adornee)
 		coroutine.wrap(function()
 			local NewGui = self:NewGui()
 			self.ChatParent = NewGui.SurfaceGui
-			self.ChatFrameOBJV = ChatFrameOBJV
 			
 			if not Adornee then
 				Adornee = Instance.new("Part")
@@ -99,16 +82,13 @@ function ChatModule.New(self)
 			ContextActionService:BindAction("VRChatInput", function(Name, State, Input)
 				if State == Enum.UserInputState.Begin then
 					local Character = self:GetCharacter()
-					
-					if Character and Character.Humanoid.RigType == Enum.HumanoidRigType.R6 then
-						if Input.KeyCode == Enum.KeyCode.ButtonY then
-							self.ShowChatUI = not self.ShowChatUI
-						end
+					if Input.KeyCode == Enum.KeyCode.ButtonY then
+						self.ShowChatUI = not self.ShowChatUI
+					end
 
-						if (Input.KeyCode == Enum.KeyCode.ButtonB or Input.KeyCode == Enum.KeyCode.Slash) and self:GetCharacter() then
-							RunService.Stepped:Wait()
-							Chat:FocusChatBar()
-						end
+					if (Input.KeyCode == Enum.KeyCode.ButtonB or Input.KeyCode == Enum.KeyCode.Slash) and self:GetCharacter() then
+						RunService.Stepped:Wait()
+						Chat:FocusChatBar()
 					end
 				end
 			end, false, Enum.KeyCode.ButtonY, Enum.KeyCode.ButtonB, Enum.KeyCode.Slash)

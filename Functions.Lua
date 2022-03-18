@@ -1,6 +1,5 @@
 local RunService = game:GetService("RunService")
 local VRService = game:GetService("VRService")
-local Players = game:GetService("Players")
 
 local Camera = workspace.CurrentCamera
 
@@ -12,15 +11,6 @@ local Functions = {}
 function Functions.New(self)
 	function self:ScaleCFrame(CF, Scale)
 		return CFrame.new(CF.Position * Scale) * CFrame.fromEulerAnglesXYZ(CF:ToEulerAnglesXYZ())
-	end
-
-	function self:SetWorldCFrame(Joint, CF, Root)
-		local Character = self:GetCharacter()
-		
-		local Root = Root or Character.Torso
-		local Origin = Root.CFrame * Joint.C0 * Joint.Transform
-
-		Joint.C1 = Origin:ToObjectSpace(CF):Inverse()
 	end
 
 	function self:GetUserCFrames()
@@ -92,58 +82,6 @@ function Functions.New(self)
 				end)
 			else
 				warn(Type, "is not a valid Disconnect type : EventConnection, RunBind, Input")
-			end
-		end
-	end
-	
-	--
-	
-	function self:SolveSE(OriginCF, TargetPos, LegY)	
-		local Localized = OriginCF:pointToObjectSpace(TargetPos)
-		local LocalizedUnit = Localized.Unit
-		local Mag = Localized.Magnitude
-		local PlaneCF = OriginCF * CFrame.fromAxisAngle(Vector3.new(0, 0, -1):Cross(LocalizedUnit), math.acos(-LocalizedUnit.Z))
-
-		return PlaneCF * CFrame.new(0, 0, LegY - (Mag)+math.max(0,Mag-(LegY))) * CFrame.fromEulerAnglesXYZ(math.rad(90), 0, 0)
-	end
-
-	function self:GetJointStart(Joint, Limb)
-		local Character = self:GetCharacter()
-
-		local Motor = self.Motors[Joint.Name]
-		local Start = Character.Torso.CFrame * Motor.Origin * Motor.Offset:Inverse()
-
-		return Start
-	end
-
-	function self:PositionJoint(Joint, Leg, EndGoal)
-		local Character = self:GetCharacter()
-
-		if Leg and Joint then
-			local Motor = self.Motors[Joint.Name]
-			local Start =  self:GetJointStart(Joint, Leg) * CFrame.new(0, Leg.Size.Y/2, 0)
-			local Plane = self:SolveSE(Start, EndGoal, Leg.Size.Y)
-
-			self:SetWorldCFrame(Joint, Plane * CFrame.new(Vector3.new(0,-Leg.Size.Y/2,0)))
-		end
-	end
-	
-	--
-	
-	function self:GetHumanoidSeatPart() -- // Nexus :)
-		local Character = self:GetCharacter()
-
-		if not Character.Humanoid.Sit then
-			return nil
-		end
-		
-		if Character.Humanoid.SeatPart then
-			return Character.Humanoid.SeatPart
-		end
-
-		for Index, ConnectedPart in pairs(Character.HumanoidRootPart:GetConnectedParts()) do
-			if ConnectedPart:IsA("Seat") or ConnectedPart:IsA("VehicleSeat") then
-				return ConnectedPart
 			end
 		end
 	end

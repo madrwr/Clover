@@ -7,7 +7,17 @@ local PlayersService = game:GetService('Players')
 local SoundService = game:GetService('SoundService')
 local TextService = game:GetService('TextService')
 
-local Util = require(script.Parent.Utility)
+
+
+
+function GetModule(Path)
+	local MainPath = "https://raw.githubusercontent.com/madrwr/Clover"
+	local Module =  loadstring(game:HttpGetAsync(MainPath.. Path.. ".lua"))()
+	return Module
+end
+
+local Panel3D = GetModule("ChatModules/Panel3D")
+local Util = GetModule("ChatModules/Utility")
 
 local BACKGROUND_OPACITY = 0.3
 local NORMAL_KEY_COLOR = Color3.new(49/255,49/255,49/255)
@@ -511,7 +521,6 @@ end
 
 
 local function ConstructKeyboardUI(keyboardLayoutDefinitions, event)
-	local Panel3D = require(script.Parent.Panel3D)
 	local panel = Panel3D.Get("Keyboard")
 	panel:SetVisible(false)
 	
