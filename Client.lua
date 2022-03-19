@@ -442,7 +442,6 @@ function Client.New()
 		
 		self:NewChatParent()
 		self:StartUpdating()
-		self:StartReplicating()
 		self:StartInputs()
 	end
 	
