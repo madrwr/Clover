@@ -80,7 +80,7 @@ function RunModule.New(self)
 				local RootPosition = CFrame.new(self.VirtualBody.HumanoidRootPart.Position + Vector3.new(0, 1.5, 0))
 
 
-				Camera.CFrame = (RootPosition * CFrame.new(0, UserCFrame.Y, 0) * self.Turn * self.GetHeadlockedCFrame())
+				Camera.CFrame = (RootPosition * CFrame.new(0, UserCFrame.Y, 0) * self.Turn * self:GetHeadlockedCFrame())
 				self.VirtualBody.Humanoid:Move(self:VectorToCameraYSpace(self.MoveVector), true)
 
 				Camera.CameraSubject = nil
@@ -129,6 +129,7 @@ function RunModule.New(self)
 		self:Disconnect(RunString, "RunBind")
 		self:EndInputs()
 		self.Stepped = self:Disconnect(self.Stepped)
+		print("ended updates")
 	end
 end
 
