@@ -126,7 +126,6 @@ function RunModule.New(self)
 			while Enabled do
 				self:FootYield()
 				self:UpdateFooting()
-				RunService.RenderStepped:Wait()
 			end
 		end)()
 	end

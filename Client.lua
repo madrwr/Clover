@@ -353,7 +353,7 @@ function Client.New()
 	self:Require("Functions")
 	self:Require("RunModule")
 	self:Require("Input")
-	self:Require("ChatModules/ChatMain")
+	self:Require("ChatMain")
 	self:Require("Footing")
 
 	-- // Character

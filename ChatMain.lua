@@ -14,7 +14,7 @@ end
 
 function ChatModule.New(self)
 	local Chat = require(Players.LocalPlayer:WaitForChild("PlayerScripts"):WaitForChild("ChatScript"):WaitForChild("ChatMain"))
-	local Keyboard = GetModule("ChatModules/KeyBoard")
+	local Keyboard = GetModule("KeyBoard")
 	
 	
 	function self:NewGui()
