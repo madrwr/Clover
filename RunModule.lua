@@ -63,7 +63,9 @@ function RunModule.New(self)
 
 	function self:StartUpdating()
 		local Enabled = true
-
+		
+		
+		self.LastUserPosition = VRService:GetUserCFrame(Enum.UserCFrame.Head).Position
 		RunService:BindToRenderStep(RunString, Enum.RenderPriority.Camera.Value - 1, function(Delta)
 			local Character = self:GetCharacter()
 
