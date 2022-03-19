@@ -467,14 +467,15 @@ end
 
 function Client:Require(Name)
 	local Module
-	pcall(function()
+	local _, Msg = pcall(function()
 		Module = GetModule(Name)
 	end)
 
 	if Module then
+		print(Module, "found, adding functions to superself")
 		Module(self)
 	else
-		warn(Name, " is not a valid path")
+		warn(Name, Msg)
 	end
 end
 
