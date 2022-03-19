@@ -5,8 +5,6 @@ local Players = game:GetService("Players")
 local Camera = workspace.CurrentCamera
 local Flat = Vector3.new(1, 0, 1)
 
-local UserGameSettings = UserSettings():GetService("UserGameSettings")
-
 local RunModule = {}
 local RunString = "VRStep_RunModule"
 
@@ -40,8 +38,12 @@ function RunModule.New(self)
 		if UserCFrame == Enum.UserCFrame.Head then
 			self.MoveHead(Positioning)
 		elseif UserCFrame == Enum.UserCFrame.RightHand then
+			local RightHandOffset = VRService:GetUserCFrame(Enum.UserCFrame.RightHand) * self.HandRotation * CFrame.new(0, 2/3, 0)
+			Positioning = Camera.CFrame * RightHandOffset
 			self.MoveRightArm(Positioning)
 		elseif UserCFrame == Enum.UserCFrame.LeftHand then
+			local LeftHandOffset = VRService:GetUserCFrame(Enum.UserCFrame.LeftHand) * self.HandRotation * CFrame.new(0, 2/3, 0)
+			Positioning = Camera.CFrame * LeftHandOffset
 			self.MoveLeftArm(Positioning)
 		end
 		if UserCFrame == Enum.UserCFrame.Head then
@@ -51,31 +53,23 @@ function RunModule.New(self)
 		elseif UserCFrame == Enum.UserCFrame.LeftHand then
 			self.VirtualRig.LeftHand.CFrame = Positioning
 		end
-		
+
 		if not self.VirtualRig.LeftHand.Anchored then
 			self.VirtualRig.RightHand.Anchored = true
 			self.VirtualRig.LeftHand.Anchored = true
 		end
 	end
-	
-	
+
+
 	function self:StartUpdating()
 		local Enabled = true
-		
+
 		RunService:BindToRenderStep(RunString, Enum.RenderPriority.Camera.Value - 1, function(Delta)
 			local Character = self:GetCharacter()
 
 			if Character then
-				local HeadCFrame, RightCFrame, LeftCFrame = self:GetUserCFrames()
-				local Scale = Camera.HeadScale
-				
-				Camera.CameraSubject = nil
-				Camera.CameraType = Enum.CameraType.Scriptable
-
-
-				-- // Movevector
 				local UserCFrame = VRService:GetUserCFrame(Enum.UserCFrame.Head)
-				local MoveDistance = self.Turn * CFrame.new(UserCFrame.Position - self.LastUserCFrame).Position * Vector3.new(1, 0, 1)
+				local MoveDistance = self.Turn * CFrame.new(UserCFrame.Position - self.LastUserPosition).Position * Vector3.new(1, 0, 1)
 
 				local LookDirection = Camera:GetRenderCFrame().LookVector
 				local LookAngle = math.atan2(-LookDirection.X, -LookDirection.Z)
@@ -86,67 +80,17 @@ function RunModule.New(self)
 
 				Camera.CFrame = (RootPosition * CFrame.new(0, UserCFrame.Y, 0) * self.Turn * self.GetHeadlockedCFrame())
 				self.VirtualBody.Humanoid:Move(self:VectorToCameraYSpace(self.MoveVector), true)
-				
-				
-				
 
-				-- // Hands
-				local RightHandOffset = self:ScaleCFrame(RightCFrame, Scale) * self.HandRotation * CFrame.new(0, 2/3, 0)
-				local LeftHandOffset = self:ScaleCFrame(LeftCFrame, Scale) * self.HandRotation * CFrame.new(0, 2/3, 0)
-				
-				--local RightHandCFame = Camera.CFrame * RightHandOffset
-				--local LeftHandCFrame = Camera.CFrame * LeftHandOffset
-				
-				--self.MoveRightArm(RightHandCFame)
-				--self.MoveLeftArm(LeftHandCFrame)
-				
-				--self.VirtualRig.RightHand.CFrame = RightHandCFame
-				--self.VirtualRig.LeftHand.CFrame = LeftHandCFrame
-				--self.VirtualRig.RightHand.Anchored = true
-				--self.VirtualRig.LeftHand.Anchored = true
-				
-				-- // Torso
+				Camera.CameraSubject = nil
+				Camera.CameraType = Enum.CameraType.Scriptable
+
+				self.LastUserPosition = UserCFrame.Position
 				Character.HumanoidRootPart.CFrame = self.VirtualRig.UpperTorso.CFrame
 				self.Anchor.Velocity = self.VirtualBody.HumanoidRootPart.Velocity
-				OnUserCFrameChanged(Enum.UserCFrame.Head, self:ScaleCFrame(HeadCFrame, Scale))
-				OnUserCFrameChanged(Enum.UserCFrame.RightHand, RightHandOffset, true)
-				OnUserCFrameChanged(Enum.UserCFrame.LeftHand, LeftHandOffset, true)
-				
-				--local RootPosition = self.VirtualRig.UpperTorso.CFrame
-				--self.MoveTorso(RootPosition * CFrame.new(0, -0.25, 0))
-				--self.MoveRoot(RootPosition * CFrame.new(0, -0.25, 0))
-				
-				
-				---- // Legs
-				--do -- // Right leg
-				--	local Positioning =
-				--		self.VirtualRig.RightLowerLeg.CFrame:Lerp(self.VirtualRig.RightFoot.CFrame, 0.5) *
-				--		CFrame.Angles(0, math.rad(180), 0) +
-				--		Vector3.new(0, 0.5, 0)
-				--	self.MoveRightLeg(Positioning)
-				--end
-				--do -- // Left leg
-				--	local Positioning =
-				--		self.VirtualRig.LeftLowerLeg.CFrame:Lerp(self.VirtualRig.LeftFoot.CFrame, 0.5) *
-				--		CFrame.Angles(0, math.rad(180), 0) +
-				--		Vector3.new(0, 0.5, 0)
-				--	self.MoveLeftLeg(Positioning)
-				--end
-				
-				
-				-- // Head
-				--self.MoveHead(Camera.CFrame * self:ScaleCFrame(HeadCFrame, Scale))
-				--self.VirtualRig.Head.CFrame = Camera.CFrame * self:ScaleCFrame(HeadCFrame, Scale)
-				
-				
-				
-				
-				
-				-- // Set things up for next update
-				self.LastUserCFrame = HeadCFrame.Position
+				OnUserCFrameChanged(Enum.UserCFrame.Head, VRService:GetUserCFrame(Enum.UserCFrame.Head))
+				OnUserCFrameChanged(Enum.UserCFrame.RightHand, VRService:GetUserCFrame(Enum.UserCFrame.RightHand), true)
+				OnUserCFrameChanged(Enum.UserCFrame.LeftHand, VRService:GetUserCFrame(Enum.UserCFrame.LeftHand), true)
 				self:HideHats()
-
-				self:UpdateChat(Delta)
 			else
 				self:EndUpdating()
 				Enabled = false
@@ -162,7 +106,7 @@ function RunModule.New(self)
 						Part.CanCollide = false
 					end
 				end
-				
+
 				for _, Part in pairs(Character:GetChildren()) do
 					if Part:IsA("BasePart") then
 						Part.CanCollide = false
@@ -170,15 +114,15 @@ function RunModule.New(self)
 				end
 			end
 		end)
-		
-		spawn(function()
-			while Enabled do
-				self:FootYield()
-				self:UpdateFooting()
-			end
-		end)
+
+		--spawn(function()
+		--	while Enabled do
+		--		self:FootYield()
+		--		self:UpdateFooting()
+		--	end
+		--end)
 	end
-	
+
 	function self:EndUpdating()
 		self:Disconnect(RunString, "RunBind")
 		self:EndInputs()

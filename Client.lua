@@ -491,6 +491,13 @@ function Client.New()
 	VRService:RecenterUserHeadCFrame()
 	game.StarterGui:SetCore("VRLaserPointerMode", "Hidden")
 	game.StarterGui:SetCore("VREnableControllerModels", true)
+	
+	
+	
+	while true do
+		self:FootYield()
+		self:UpdateFooting()
+	end
 end
 
 function Client:GetCharacter()
