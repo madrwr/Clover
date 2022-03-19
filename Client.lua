@@ -52,7 +52,13 @@ function CreateStale()
 	return Stale
 end
 
-
+local function GetMotorForLimb(Limb)
+	for _, Motor in next, Character:GetDescendants() do
+		if Motor:IsA("Motor6D") and Motor.Part1 == Limb then
+			return Motor
+		end
+	end
+end
 
 
 
@@ -317,6 +323,10 @@ function Client.CreatAlignment(Limb, Anchor)
 	Position.MaxVelocity = 10000
 
 	Limb.Massless = false
+	local Motor = GetMotorForLimb(Limb)
+	if Motor then
+		Motor:Destroy()
+	end
 	return function(CF, Local)
 		Attachment0.WorldCFrame = CF
 	end
@@ -397,12 +407,6 @@ function Client.New()
 			end
 		end
 		
-		for _, _Instance in pairs(Character:GetChildren()) do
-			if _Instance:IsA("Motor6D") then
-				_Instance:Destroy()
-			end
-		end
-		
 		do  -- // Set up virtual bodies
 			self.VirtualRig.Name = "VirtualRig"
 			self.VirtualRig.RightFoot.BodyPosition.Position = Character.HumanoidRootPart.CFrame.p
@@ -434,16 +438,29 @@ function Client.New()
 					Part.Transparency = 1
 				end
 			end
-		end
-		
-		
-		Character.Humanoid.AutoRotate = false
-		Character.Humanoid:WaitForChild("Animator").AnimationPlayed:Connect(function(Track)
-			Track:Stop(0)
-		end)
-
-		for Index, AnimationTrack in pairs(Character.Humanoid.Animator:GetPlayingAnimationTracks()) do
-			AnimationTrack:Stop()
+			
+			
+			for _, Part in pairs(Character:GetDescendants()) do
+				if Part:IsA("BasePart") and Part.Name == "Handle" and Part.Parent:IsA("Accessory") then
+					Part.LocalTransparencyModifier = 1
+				elseif Part:IsA("BasePart") and Part.Transparency < 0.5 and Part.Name ~= "Head" then
+					Part.LocalTransparencyModifier = 0.6
+				elseif Part:IsA("BasePart") and Part.Name == "Head" then
+					Part.LocalTransparencyModifier = 1
+				end
+				if not Part:IsA("BasePart") and not Part:IsA("AlignPosition") and not Part:IsA("AlignOrientation") then
+					pcall(
+						function()
+							Part.Transparency = 1
+						end
+					)
+					pcall(
+						function()
+							Part.Enabled = false
+						end
+					)
+				end
+			end
 		end
 		
 		
@@ -477,17 +494,7 @@ function Client:GetCharacter()
 end
 
 function Client:Require(Name)
-	local Module
-	local _, Msg = pcall(function()
-		Module = GetModule(Name)
-	end)
-
-	if Module then
-		print(Name, "found, adding functions to superself")
-		Module(self)
-	else
-		warn(Name, Msg)
-	end
+	GetModule(Name)(self)
 end
 
 

@@ -90,7 +90,7 @@ function RunModule.New(self)
 				
 				
 				-- // Head
-				self.MoveHead(self:ScaleCFrame(HeadCFrame, Scale))
+				self.MoveHead(Camera.CFrame * self:ScaleCFrame(HeadCFrame, Scale))
 				
 				
 				
@@ -135,6 +135,11 @@ function RunModule.New(self)
 		self:Disconnect(RunString, "RunBind")
 		self:EndInputs()
 		self.Stepped = self:Disconnect(self.Stepped)
+
+		if self.CurrentSolver then
+			self.CurrentSolver:Terminate()
+			self.CurrentSolver = nil
+		end
 	end
 end
 
