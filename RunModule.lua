@@ -13,6 +13,52 @@ local RunString = "VRStep_RunModule"
 
 
 function RunModule.New(self)
+	local function OnUserCFrameChanged(UserCFrame, Positioning, IgnoreTorso)
+		local Positioning = Camera.CFrame * Positioning
+		if not IgnoreTorso then
+			local RootPosition = self.VirtualRig.UpperTorso.CFrame
+			self.MoveTorso(RootPosition * CFrame.new(0, -0.25, 0))
+			self.MoveRoot(RootPosition * CFrame.new(0, -0.25, 0))
+
+
+			-- // Legs
+			do -- // Right leg
+				local Positioning =
+					self.VirtualRig.RightLowerLeg.CFrame:Lerp(self.VirtualRig.RightFoot.CFrame, 0.5) *
+					CFrame.Angles(0, math.rad(180), 0) +
+					Vector3.new(0, 0.5, 0)
+				self.MoveRightLeg(Positioning)
+			end
+			do -- // Left leg
+				local Positioning =
+					self.VirtualRig.LeftLowerLeg.CFrame:Lerp(self.VirtualRig.LeftFoot.CFrame, 0.5) *
+					CFrame.Angles(0, math.rad(180), 0) +
+					Vector3.new(0, 0.5, 0)
+				self.MoveLeftLeg(Positioning)
+			end
+		end
+		if UserCFrame == Enum.UserCFrame.Head then
+			self.MoveHead(Positioning)
+		elseif UserCFrame == Enum.UserCFrame.RightHand then
+			self.MoveRightArm(Positioning)
+		elseif UserCFrame == Enum.UserCFrame.LeftHand then
+			self.MoveLeftArm(Positioning)
+		end
+		if UserCFrame == Enum.UserCFrame.Head then
+			self.VirtualRig.Head.CFrame = Positioning
+		elseif UserCFrame == Enum.UserCFrame.RightHand then
+			self.VirtualRig.RightHand.CFrame = Positioning
+		elseif UserCFrame == Enum.UserCFrame.LeftHand then
+			self.VirtualRig.LeftHand.CFrame = Positioning
+		end
+		
+		if not self.VirtualRig.LeftHand.Anchored then
+			self.VirtualRig.RightHand.Anchored = true
+			self.VirtualRig.LeftHand.Anchored = true
+		end
+	end
+	
+	
 	function self:StartUpdating()
 		local Enabled = true
 		
@@ -53,46 +99,49 @@ function RunModule.New(self)
 				local RightHandOffset = self:ScaleCFrame(RightCFrame, Scale) * self.HandRotation * CFrame.new(0, 2/3, 0)
 				local LeftHandOffset = self:ScaleCFrame(LeftCFrame, Scale) * self.HandRotation * CFrame.new(0, 2/3, 0)
 				
-				local RightHandCFame = Camera.CFrame * RightHandOffset
-				local LeftHandCFrame = Camera.CFrame * LeftHandOffset
+				--local RightHandCFame = Camera.CFrame * RightHandOffset
+				--local LeftHandCFrame = Camera.CFrame * LeftHandOffset
 				
-				self.MoveRightArm(RightHandCFame)
-				self.MoveLeftArm(LeftHandCFrame)
+				--self.MoveRightArm(RightHandCFame)
+				--self.MoveLeftArm(LeftHandCFrame)
 				
-				self.VirtualRig.RightHand.CFrame = RightHandCFame
-				self.VirtualRig.LeftHand.CFrame = LeftHandCFrame
-				self.VirtualRig.RightHand.Anchored = true
-				self.VirtualRig.LeftHand.Anchored = true
+				--self.VirtualRig.RightHand.CFrame = RightHandCFame
+				--self.VirtualRig.LeftHand.CFrame = LeftHandCFrame
+				--self.VirtualRig.RightHand.Anchored = true
+				--self.VirtualRig.LeftHand.Anchored = true
 				
 				-- // Torso
 				Character.HumanoidRootPart.CFrame = self.VirtualRig.UpperTorso.CFrame
 				self.Anchor.Velocity = self.VirtualBody.HumanoidRootPart.Velocity
+				OnUserCFrameChanged(Enum.UserCFrame.Head, self:ScaleCFrame(HeadCFrame, Scale))
+				OnUserCFrameChanged(Enum.UserCFrame.RightHand, RightHandOffset, true)
+				OnUserCFrameChanged(Enum.UserCFrame.LeftHand, LeftHandOffset, true)
 				
-				local RootPosition = self.VirtualRig.UpperTorso.CFrame
-				self.MoveTorso(RootPosition * CFrame.new(0, -0.25, 0))
-				self.MoveRoot(RootPosition * CFrame.new(0, -0.25, 0))
+				--local RootPosition = self.VirtualRig.UpperTorso.CFrame
+				--self.MoveTorso(RootPosition * CFrame.new(0, -0.25, 0))
+				--self.MoveRoot(RootPosition * CFrame.new(0, -0.25, 0))
 				
 				
-				-- // Legs
-				do -- // Right leg
-					local Positioning =
-						self.VirtualRig.RightLowerLeg.CFrame:Lerp(self.VirtualRig.RightFoot.CFrame, 0.5) *
-						CFrame.Angles(0, math.rad(180), 0) +
-						Vector3.new(0, 0.5, 0)
-					self.MoveRightLeg(Positioning)
-				end
-				do -- // Left leg
-					local Positioning =
-						self.VirtualRig.LeftLowerLeg.CFrame:Lerp(self.VirtualRig.LeftFoot.CFrame, 0.5) *
-						CFrame.Angles(0, math.rad(180), 0) +
-						Vector3.new(0, 0.5, 0)
-					self.MoveLeftLeg(Positioning)
-				end
+				---- // Legs
+				--do -- // Right leg
+				--	local Positioning =
+				--		self.VirtualRig.RightLowerLeg.CFrame:Lerp(self.VirtualRig.RightFoot.CFrame, 0.5) *
+				--		CFrame.Angles(0, math.rad(180), 0) +
+				--		Vector3.new(0, 0.5, 0)
+				--	self.MoveRightLeg(Positioning)
+				--end
+				--do -- // Left leg
+				--	local Positioning =
+				--		self.VirtualRig.LeftLowerLeg.CFrame:Lerp(self.VirtualRig.LeftFoot.CFrame, 0.5) *
+				--		CFrame.Angles(0, math.rad(180), 0) +
+				--		Vector3.new(0, 0.5, 0)
+				--	self.MoveLeftLeg(Positioning)
+				--end
 				
 				
 				-- // Head
-				self.MoveHead(Camera.CFrame * self:ScaleCFrame(HeadCFrame, Scale))
-				self.VirtualRig.Head.CFrame = Camera.CFrame * self:ScaleCFrame(HeadCFrame, Scale)
+				--self.MoveHead(Camera.CFrame * self:ScaleCFrame(HeadCFrame, Scale))
+				--self.VirtualRig.Head.CFrame = Camera.CFrame * self:ScaleCFrame(HeadCFrame, Scale)
 				
 				
 				

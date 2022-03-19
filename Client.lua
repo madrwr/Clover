@@ -371,6 +371,8 @@ function Client.New()
 		self.Anchor.Parent = workspace
 		
 		
+		local CharacterCFrame = Character.HumanoidRootPart.CFrame
+		
 		Client.Permakill()
 		self.MoveHead = Client.CreatAlignment(self.Reanimation["Head"], self.Anchor)
 		self.MoveRightArm = Client.CreatAlignment(self.Reanimation["Right Arm"], self.Anchor)
@@ -406,65 +408,71 @@ function Client.New()
 			end
 		end
 		
-		do  -- // Set up virtual bodies
-			self.VirtualRig.Name = "VirtualRig"
-			self.VirtualRig.RightFoot.BodyPosition.Position = Character.HumanoidRootPart.CFrame.p
-			self.VirtualRig.LeftFoot.BodyPosition.Position = Character.HumanoidRootPart.CFrame.p
-			self.VirtualRig.Parent = workspace
-			self.VirtualRig:SetPrimaryPartCFrame(Character.HumanoidRootPart.CFrame)
-			self.VirtualRig.Humanoid.Health = 0
-			self.VirtualRig:BreakJoints()
-			for _, Part in pairs(self.VirtualRig:GetChildren()) do
-				if Part:IsA("BasePart") then
-					Part.CFrame = Character.HumanoidRootPart.CFrame
-				end
+		self.VirtualRig.Name = "VirtualRig"
+		self.VirtualRig.RightFoot.BodyPosition.Position = CharacterCFrame.p
+		self.VirtualRig.LeftFoot.BodyPosition.Position = Character.HumanoidRootPart.CFrame.p
+		self.VirtualRig.Parent = workspace
+		self.VirtualRig:SetPrimaryPartCFrame(CharacterCFrame)
+		self.VirtualRig.Humanoid.Health = 0
+		self.VirtualRig:BreakJoints()
+		for _, Part in pairs(self.VirtualRig:GetChildren()) do
+			if Part:IsA("BasePart") then
+				Part.CFrame = Character.HumanoidRootPart.CFrame
 			end
-			--
-			self.VirtualBody.Parent = workspace
-			self.VirtualBody.Name = "VirtualBody"
-			self.VirtualBody.Humanoid.WalkSpeed = 8
-			self.VirtualBody:SetPrimaryPartCFrame(Character.HumanoidRootPart.CFrame)
-			--
-			Character.Humanoid.WalkSpeed = 0
-			Character.Humanoid.JumpPower = 1
-			for _, Part in pairs(self.VirtualBody:GetChildren()) do
-				if Part:IsA("BasePart") then
-					Part.Transparency = 1
-				end
+		end
+		--
+		self.VirtualBody.Parent = workspace
+		self.VirtualBody.Name = "VirtualBody"
+		self.VirtualBody.Humanoid.WalkSpeed = 8
+		self.VirtualBody:SetPrimaryPartCFrame(CharacterCFrame)
+		--
+		Character.Humanoid.WalkSpeed = 0
+		Character.Humanoid.JumpPower = 1
+		for _, Part in pairs(self.VirtualBody:GetChildren()) do
+			if Part:IsA("BasePart") then
+				Part.Transparency = 1
 			end
-			for _, Part in pairs(self.VirtualRig:GetChildren()) do
-				if Part:IsA("BasePart") then
-					Part.Transparency = 1
-				end
+		end
+		for _, Part in pairs(self.VirtualRig:GetChildren()) do
+			if Part:IsA("BasePart") then
+				Part.Transparency = 1
 			end
-			
-			
-			for _, Part in pairs(Character:GetDescendants()) do
-				if Part:IsA("BasePart") and Part.Name == "Handle" and Part.Parent:IsA("Accessory") then
-					Part.LocalTransparencyModifier = 1
-				elseif Part:IsA("BasePart") and Part.Transparency < 0.5 and Part.Name ~= "Head" then
-					Part.LocalTransparencyModifier = 0.6
-				elseif Part:IsA("BasePart") and Part.Name == "Head" then
-					Part.LocalTransparencyModifier = 1
-				end
-				if not Part:IsA("BasePart") and not Part:IsA("AlignPosition") and not Part:IsA("AlignOrientation") then
-					pcall(
-						function()
-							Part.Transparency = 1
-						end
-					)
-					pcall(
-						function()
-							Part.Enabled = false
-						end
-					)
-				end
+		end
+
+
+		for _, Part in pairs(Character:GetDescendants()) do
+			if Part:IsA("BasePart") and Part.Name == "Handle" and Part.Parent:IsA("Accessory") then
+				Part.LocalTransparencyModifier = 0
+			elseif Part:IsA("BasePart") and Part.Transparency < 0.5 and Part.Name ~= "Head" then
+				Part.LocalTransparencyModifier = 0.6
+			elseif Part:IsA("BasePart") and Part.Name == "Head" then
+				Part.LocalTransparencyModifier = 0
+			end
+			if not Part:IsA("BasePart") and not Part:IsA("AlignPosition") and not Part:IsA("AlignOrientation") then
+				pcall(
+					function()
+						Part.Transparency = 0
+					end
+				)
+				pcall(
+					function()
+						Part.Enabled = false
+					end
+				)
 			end
 		end
 		
 		
 		
 		self.RayIgnore = {self.VirtualRig, self.VirtualBody, Character, Camera, self.Anchor}
+		
+		
+		
+		
+		
+		
+		
+		
 		
 		
 		
