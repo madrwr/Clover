@@ -48,52 +48,50 @@ function ChatModule.New(self)
 		ChatFrame.Active = false
 		
 		for Index, Thing in pairs(ChatFrame:GetDescendants()) do
-			pcall(function()
+			if Thing:IsA("Frame") or Thing:IsA("ImageButton") or Thing:IsA("TextBox") or Thing:IsA("TextButton") or Thing:IsA("TextLabel") or Thing:IsA("ImageLabel") then
 				Thing.Active = false
-			end)
+			end
 		end
 	end
 	
 	function self:NewChatParent(Adornee)
-		coroutine.wrap(function()
-			local NewGui = self:NewGui()
-			self.ChatParent = NewGui.SurfaceGui
-			
-			if not Adornee then
-				Adornee = Instance.new("Part")
-				Adornee.Anchored = true
-				Adornee.CanCollide = false
-				Adornee.Transparency = 1
-				
-				Adornee.Parent = Camera
-			end
-			
-			
-			NewGui.SurfaceGui.Adornee = Adornee
-			NewGui.CanvasSize = Vector2.new(750,750)
-			
-			self:MoveChat(self.ChatParent)
-			
-			
-			
-			self.ShowChatUI = true			
-			ContextActionService:BindAction("VRChatInput", function(Name, State, Input)
-				if State == Enum.UserInputState.Begin then
-					local Character = self:GetCharacter()
-					if Input.KeyCode == Enum.KeyCode.ButtonY then
-						self.ShowChatUI = not self.ShowChatUI
-					end
+		local NewGui = self:NewGui()
+		self.ChatParent = NewGui.SurfaceGui
 
-					if (Input.KeyCode == Enum.KeyCode.ButtonB or Input.KeyCode == Enum.KeyCode.Slash) and self:GetCharacter() then
-						RunService.Stepped:Wait()
-						Chat:FocusChatBar()
-					end
+		if not Adornee then
+			Adornee = Instance.new("Part")
+			Adornee.Anchored = true
+			Adornee.CanCollide = false
+			Adornee.Transparency = 1
+
+			Adornee.Parent = Camera
+		end
+
+
+		NewGui.SurfaceGui.Adornee = Adornee
+		NewGui.CanvasSize = Vector2.new(750,750)
+
+		self:MoveChat(self.ChatParent)
+
+
+
+		self.ShowChatUI = true			
+		ContextActionService:BindAction("VRChatInput", function(Name, State, Input)
+			if State == Enum.UserInputState.Begin then
+				local Character = self:GetCharacter()
+				if Input.KeyCode == Enum.KeyCode.ButtonY then
+					self.ShowChatUI = not self.ShowChatUI
 				end
-			end, false, Enum.KeyCode.ButtonY, Enum.KeyCode.ButtonB, Enum.KeyCode.Slash)
-			
 
-			self:UpdateSize(NewGui)
-		end)()
+				if (Input.KeyCode == Enum.KeyCode.ButtonB or Input.KeyCode == Enum.KeyCode.Slash) and Character then
+					RunService.Stepped:Wait()
+					Chat:FocusChatBar()
+				end
+			end
+		end, false, Enum.KeyCode.ButtonY, Enum.KeyCode.ButtonB, Enum.KeyCode.Slash)
+
+
+		self:UpdateSize(NewGui)
 	end
 	
 	

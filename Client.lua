@@ -456,7 +456,7 @@ function Client.New()
 		Client.CreateLegSockets(Character)
 		Client.PhysicsBypass()
 		
-		--self:NewChatParent()
+		self:NewChatParent()
 		self:StartUpdating()
 		self:StartInputs()
 	end
@@ -483,7 +483,7 @@ function Client:Require(Name)
 	end)
 
 	if Module then
-		print(Module, "found, adding functions to superself")
+		print(Name, "found, adding functions to superself")
 		Module(self)
 	else
 		warn(Name, Msg)
