@@ -6,6 +6,22 @@ local LocalPlayer = Players.LocalPlayer
 local Camera = workspace.CurrentCamera
 
 
+-- // Disable kicking
+local OldNamecall
+OldNamecall = hookmetamethod(game, "__namecall", function(Self, ...)
+	local args = {...} 
+	if getnamecallmethod() == 'Kick' then 
+		return false
+	end
+	return OldNamecall(Self, unpack(args))
+end)
+
+
+
+
+
+
+
 
 function GetModule(module)
 	return loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/madrwr/Clover/main/" .. module .. ".lua"))()
@@ -444,10 +460,6 @@ function Client.New()
 		self:StartUpdating()
 		self:StartInputs()
 	end
-	
-	
-	
-	
 	
 	
 
