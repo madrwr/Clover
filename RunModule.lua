@@ -74,22 +74,17 @@ function RunModule.New(self)
 
 
 				-- // Movevector
-				local MoveVector = self.Turn * CFrame.new(HeadCFrame.Position - self.LastUserCFrame.p).Position * Flat	
+				local UserCFrame = VRService:GetUserCFrame(Enum.UserCFrame.Head)
+				local MoveDistance = self.Turn * CFrame.new(UserCFrame.Position - self.LastUserCFrame).Position * Vector3.new(1, 0, 1)
 
-				-- // Root And Camera
-				Camera.CFrame = self.Turn * self:GetHeadlockedCFrame()
-
-				local CameraAngle = self:GetLookAngle(Camera:GetRenderCFrame())
-				local RootAngle = self:GetLookAngle(Character.HumanoidRootPart.CFrame)
-				local Rotation = CFrame.fromEulerAnglesXYZ(0, CameraAngle, 0)
-				self.VirtualBody.HumanoidRootPart.CFrame = CFrame.new(self.VirtualBody.HumanoidRootPart.Position + MoveVector * Scale) * Rotation
+				local LookDirection = Camera:GetRenderCFrame().LookVector
+				local LookAngle = math.atan2(-LookDirection.X, -LookDirection.Z)
+				local RawPosition = self.VirtualBody.HumanoidRootPart.Position + MoveDistance
+				self.VirtualBody.HumanoidRootPart.CFrame = CFrame.lookAt(RawPosition, RawPosition + CFrame.fromEulerAnglesXYZ(0, LookAngle, 0).LookVector)
+				local RootPosition = CFrame.new(self.VirtualBody.HumanoidRootPart.Position + Vector3.new(0, 1.5, 0))
 
 
-				local BaseHeight = (Character.Torso.Size.Y+Character.Head.Size.Y)/2
-				local Height = HeadCFrame.Y*Scale
-				local HeightPosition = (self.VirtualBody.HumanoidRootPart.CFrame * CFrame.new(0,BaseHeight + math.clamp(Height, -2, 0.25),0)).p
-
-				Camera.CFrame = CFrame.new(HeightPosition) * self.Turn * self:GetHeadlockedCFrame()
+				Camera.CFrame = (RootPosition * CFrame.new(0, UserCFrame.Y, 0) * self.Turn * self.GetHeadlockedCFrame())
 				self.VirtualBody.Humanoid:Move(self:VectorToCameraYSpace(self.MoveVector), true)
 				
 				
@@ -148,7 +143,7 @@ function RunModule.New(self)
 				
 				
 				-- // Set things up for next update
-				self.LastUserCFrame = HeadCFrame
+				self.LastUserCFrame = HeadCFrame.Position
 				self:HideHats()
 
 				self:UpdateChat(Delta)
