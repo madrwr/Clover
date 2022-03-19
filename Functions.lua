@@ -27,7 +27,6 @@ function Functions.New(self)
 
 	function self:GetHeadlockedCFrame()
 		local UserCFrame = VRService:GetUserCFrame(Enum.UserCFrame.Head)
-		UserCFrame = self:ScaleCFrame(UserCFrame, Camera.HeadScale)
 
 		return CFrame.fromEulerAnglesXYZ(UserCFrame:ToEulerAnglesXYZ()) * UserCFrame:Inverse()
 	end
