@@ -12,7 +12,7 @@ function GetModule(module)
 	return loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/madrwr/Clover/main/" .. module .. ".lua"))()
 end
 
-local Utility = GetModule("ChatModules/Utility")
+local Utility = GetModule("Utility")
 
 --Panel3D State variables
 local DefaultPixelsPerStud = 128
