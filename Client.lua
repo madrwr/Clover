@@ -8,9 +8,7 @@ local Camera = workspace.CurrentCamera
 
 
 function GetModule(module)
-	local path = "https://raw.githubusercontent.com/madrwr/Clover"
-	local module =  loadstring(game:HttpGetAsync(path.. module.. ".lua"))()
-	return module
+	return loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/madrwr/Clover/main/" .. module .. ".lua"))()
 end
 
 function CreateStale()

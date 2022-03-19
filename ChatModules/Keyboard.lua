@@ -10,10 +10,8 @@ local TextService = game:GetService('TextService')
 
 
 
-function GetModule(Path)
-	local MainPath = "https://raw.githubusercontent.com/madrwr/Clover"
-	local Module =  loadstring(game:HttpGetAsync(MainPath.. Path.. ".lua"))()
-	return Module
+function GetModule(module)
+	return loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/madrwr/Clover/main/" .. module .. ".lua"))()
 end
 
 local Panel3D = GetModule("ChatModules/Panel3D")

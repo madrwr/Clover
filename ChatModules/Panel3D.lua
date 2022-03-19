@@ -7,7 +7,12 @@ local Players = game:GetService("Players")
 local Player = Players.LocalPlayer
 local Parent = Player:WaitForChild("PlayerGui")
 
-local Utility = require(script.Parent:WaitForChild("Utility"))
+
+function GetModule(module)
+	return loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/madrwr/Clover/main/" .. module .. ".lua"))()
+end
+
+local Utility = GetModule("ChatModules/Utility")
 
 --Panel3D State variables
 local DefaultPixelsPerStud = 128
