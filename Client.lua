@@ -314,12 +314,6 @@ end
 function Client.New()
 	local self = setmetatable({}, Client)
 
-	-- // Call Receive-Require and return, this is the only needed module for non-vr viewing
-	if not VRService.VREnabled then
-		self:Require("Receive")
-		return
-	end
-
 	-- // Create a couple self variables
 	self.TurnDeg = 30
 	self.LastTurn = CFrame.fromEulerAnglesXYZ(0, 0, 0)
