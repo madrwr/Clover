@@ -52,14 +52,6 @@ function CreateStale()
 	return Stale
 end
 
-local function GetMotorForLimb(Limb)
-	for _, Motor in next, Character:GetDescendants() do
-		if Motor:IsA("Motor6D") and Motor.Part1 == Limb then
-			return Motor
-		end
-	end
-end
-
 
 
 local Client = {}
@@ -323,7 +315,7 @@ function Client.CreatAlignment(Limb, Anchor)
 	Position.MaxVelocity = 10000
 
 	Limb.Massless = false
-	local Motor = GetMotorForLimb(Limb)
+	local Motor = Client.GetMotorForLimb(Limb, Reanimation)
 	if Motor then
 		Motor:Destroy()
 	end
@@ -332,6 +324,13 @@ function Client.CreatAlignment(Limb, Anchor)
 	end
 end
 
+function Client.GetMotorForLimb(Limb, Character)
+	for _, Motor in next, Character:GetDescendants() do
+		if Motor:IsA("Motor6D") and Motor.Part1 == Limb then
+			return Motor
+		end
+	end
+end
 
 
 -- // Where the real stuff happens

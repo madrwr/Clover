@@ -112,12 +112,17 @@ function RunModule.New(self)
 			local Character = self:GetCharacter()
 
 			if Character then
-				local IsClimbing = Character.Humanoid:GetState() == Enum.HumanoidStateType.Climbing
-
-				Character.Torso.CanCollide = false
-				Character.Head.CanCollide = not IsClimbing
-
-				Character.HumanoidRootPart.CanCollide = true
+				for _, Part in pairs(self.VirtualRig:GetChildren()) do
+					if Part:IsA("BasePart") then
+						Part.CanCollide = false
+					end
+				end
+				
+				for _, Part in pairs(Character:GetChildren()) do
+					if Part:IsA("BasePart") then
+						Part.CanCollide = false
+					end
+				end
 			end
 		end)
 		
