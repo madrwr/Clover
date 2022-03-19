@@ -343,7 +343,7 @@ function Client.New()
 	self:Require("Functions")
 	self:Require("RunModule")
 	self:Require("Input")
-	self:Require("ChatModules/ChatMain")
+	--self:Require("ChatModules/ChatMain")
 	self:Require("Footing")
 
 	-- // Character
@@ -456,7 +456,7 @@ function Client.New()
 		Client.CreateLegSockets(Character)
 		Client.PhysicsBypass()
 		
-		self:NewChatParent()
+		--self:NewChatParent()
 		self:StartUpdating()
 		self:StartInputs()
 	end
