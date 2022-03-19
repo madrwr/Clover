@@ -101,7 +101,7 @@ function RunModule.New(self)
 				self.LastUserCFrame = HeadCFrame
 				self:HideHats()
 
-				self:UpdateChat(Delta)
+				--self:UpdateChat(Delta)
 			else
 				self:EndUpdating()
 				Enabled = false
