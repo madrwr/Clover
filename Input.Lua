@@ -34,7 +34,7 @@ function Input.New(self)
 		
 		ContextActionService:BindAction("Jump", function(Name, State, Input)
 			if State == Enum.UserInputState.Begin then
-				Players.LocalPlayer.Character.Humanoid.Jump = true
+				self.VirtualBody.Humanoid.Jump = true
 			end
 		end, false, Enum.KeyCode.ButtonA)
 	end

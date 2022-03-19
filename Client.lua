@@ -275,7 +275,38 @@ function Client.ClovrContainedReanimation(Character)
 	return Reanimation
 end
 
+function Client.CreatAlignment(Limb, Anchor)
+	local Reanimation = Limb.Parent
+	
+	local Attachment0 = Instance.new("Attachment", Anchor)
+	local Attachment1 = Instance.new("Attachment", Limb)
+	local Orientation = Instance.new("AlignOrientation")
+	local Position = Instance.new("AlignPosition")
+	Orientation.Attachment0 = Attachment1
+	Orientation.Attachment1 = Attachment0
+	Orientation.RigidityEnabled = false
+	Orientation.MaxTorque = 2000
+	Orientation.Responsiveness = 200
+	Orientation.Parent = Reanimation["HumanoidRootPart"]
 
+	Orientation.Name = Limb.Name.."'s AlignRot"
+	Orientation.MaxAngularVelocity = 10000
+
+	Position.Attachment0 = Attachment1
+	Position.Attachment1 = Attachment0
+	Position.RigidityEnabled = false
+	Position.MaxForce = 4000
+	Position.Responsiveness = 200
+	Position.Parent = Reanimation["HumanoidRootPart"]
+
+	Position.Name = Limb.Name.."'s AlignPos"
+	Position.MaxVelocity = 10000
+
+	Limb.Massless = false
+	return function(CF, Local)
+		Attachment0.WorldCFrame = CF
+	end
+end
 
 
 
@@ -305,7 +336,7 @@ function Client.New()
 	self:Require("RunModule")
 	self:Require("Input")
 	self:Require("ChatModules/ChatMain")
-
+	self:Require("Footing")
 
 	-- // Character
 	local Character = LocalPlayer.Character
@@ -324,10 +355,17 @@ function Client.New()
 		
 		
 		Client.Permakill()
-		Client.PhysicsBypass()
-		for _, Accessory in pairs(self.Reanimation:GetChildren()) do
-			if Accessory:IsA("Accessory") and Accessory:FindFirstChild("Handle") then
-				local Attachment1 = Accessory.Handle:FindFirstChildWhichIsA("Attachment")
+		self.MoveHead = Client.CreatAlignment(self.Reanimation["Head"], self.Anchor)
+		self.MoveRightArm = Client.CreatAlignment(self.Reanimation["Right Arm"], self.Anchor)
+		self.MoveLeftArm = Client.CreatAlignment(self.Reanimation["Left Arm"], self.Anchor)
+		self.MoveRightLeg = Client.CreatAlignment(self.Reanimation["Right Leg"], self.Anchor)
+		self.MoveLeftLeg = Client.CreatAlignment(self.Reanimation["Left Leg"], self.Anchor)
+		self.MoveTorso = Client.CreatAlignment(self.Reanimation["Torso"], self.Anchor)
+		self.MoveRoot = Client.CreatAlignment(self.Reanimation["HumanoidRootPart"], self.Anchor)
+		
+		for _, _Instance in pairs(self.Reanimation:GetChildren()) do
+			if _Instance:IsA("Accessory") and _Instance:FindFirstChild("Handle") then
+				local Attachment1 = _Instance.Handle:FindFirstChildWhichIsA("Attachment")
 				local Attachment0 = self.Reanimation:FindFirstChild(tostring(Attachment1), true)
 				local Orientation = Instance.new("AlignOrientation")
 				local Position = Instance.new("AlignPosition")
@@ -351,6 +389,11 @@ function Client.New()
 			end
 		end
 		
+		for _, _Instance in pairs(Character:GetChildren()) do
+			if _Instance:IsA("Motor6D") then
+				_Instance:Destroy()
+			end
+		end
 		
 		do  -- // Set up virtual bodies
 			self.VirtualRig.Name = "VirtualRig"
@@ -359,7 +402,6 @@ function Client.New()
 			self.VirtualRig.Parent = workspace
 			self.VirtualRig:SetPrimaryPartCFrame(Character.HumanoidRootPart.CFrame)
 			self.VirtualRig.Humanoid.Health = 0
-			--VirtualRig:FindFirstChild("HumanoidRootPart").CFrame = character1.HumanoidRootPart.CFrame
 			self.VirtualRig:BreakJoints()
 			for _, Part in pairs(self.VirtualRig:GetChildren()) do
 				if Part:IsA("BasePart") then
@@ -395,15 +437,17 @@ function Client.New()
 		for Index, AnimationTrack in pairs(Character.Humanoid.Animator:GetPlayingAnimationTracks()) do
 			AnimationTrack:Stop()
 		end
-
-		self.CurrentSolver = self:CreateSolver(Character.Torso)
 		
+		
+		
+		self.RayIgnore = {self.VirtualRig, self.VirtualBody, Character, Camera, self.Anchor}
 		
 		
 		
 		
 		Client.CreateLegSockets(Character)
-
+		Client.PhysicsBypass()
+		
 		self:NewChatParent()
 		self:StartUpdating()
 		self:StartReplicating()

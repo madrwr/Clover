@@ -1,4 +1,3 @@
-local ContextActionService = game:GetService("ContextActionService")
 local RunService = game:GetService("RunService")
 local VRService = game:GetService("VRService")
 local Players = game:GetService("Players")
@@ -15,6 +14,8 @@ local RunString = "VRStep_RunModule"
 
 function RunModule.New(self)
 	function self:StartUpdating()
+		local Enabled = true
+		
 		RunService:BindToRenderStep(RunString, Enum.RenderPriority.Camera.Value - 1, function(Delta)
 			local Character = self:GetCharacter()
 
@@ -34,27 +35,66 @@ function RunModule.New(self)
 				local CameraAngle = self:GetLookAngle(Camera:GetRenderCFrame())
 				local RootAngle = self:GetLookAngle(Character.HumanoidRootPart.CFrame)
 				local Rotation = CFrame.fromEulerAnglesXYZ(0, CameraAngle, 0)
-				Character.HumanoidRootPart.CFrame = CFrame.new(Character.HumanoidRootPart.Position + MoveVector * Scale) * Rotation
+				self.VirtualBody.HumanoidRootPart.CFrame = CFrame.new(self.VirtualBody.HumanoidRootPart.Position + MoveVector * Scale) * Rotation
 
 
 				local BaseHeight = (Character.Torso.Size.Y+Character.Head.Size.Y)/2
 				local Height = HeadCFrame.Y*Scale
-				local HeightPosition = (Character.HumanoidRootPart.CFrame * CFrame.new(0,BaseHeight + math.clamp(Height, -2, 0.25),0)).p
+				local HeightPosition = (self.VirtualBody.HumanoidRootPart.CFrame * CFrame.new(0,BaseHeight + math.clamp(Height, -2, 0.25),0)).p
 
 				Camera.CFrame = CFrame.new(HeightPosition) * self.Turn * self:GetHeadlockedCFrame()
-				Players.LocalPlayer:Move(self:VectorToCameraYSpace(self.MoveVector))
+				self.VirtualBody.Humanoid:Move(self:VectorToCameraYSpace(self.MoveVector))
+				
+				
+				
 
-
-
-
-
-
-				-- // Torso
-
-
-				-- // Hands and neck
+				-- // Hands
 				local RightHandOffset = self:ScaleCFrame(RightCFrame, Scale) * self.HandRotation * CFrame.new(0, 2/3, 0)
 				local LeftHandOffset = self:ScaleCFrame(LeftCFrame, Scale) * self.HandRotation * CFrame.new(0, 2/3, 0)
+				
+				local RightHandCFame = Camera.CFrame * RightHandOffset
+				local LeftHandCFrame = Camera.CFrame * LeftHandOffset
+				
+				self.MoveRightArm(RightHandCFame)
+				self.MoveLeftArm(LeftHandCFrame)
+				
+				self.VirtualRig.RightHand.CFrame = RightHandCFame
+				self.VirtualRig.LeftHand.CFrame = LeftHandCFrame
+				self.VirtualRig.RightHand.Anchored = true
+				self.VirtualRig.LeftHand.Anchored = true
+				
+				-- // Torso
+				Character.HumanoidRootPart.CFrame = self.VirtualRig.UpperTorso.CFrame
+				self.Anchor.Velocity = self.VirtualBody.HumanoidRootPart.Velocity
+				
+				local RootPosition = self.VirtualRig.UpperTorso.CFrame
+				self.MoveTorso(RootPosition * CFrame.new(0, -0.25, 0))
+				self.MoveRoot(RootPosition * CFrame.new(0, -0.25, 0))
+				
+				
+				-- // Legs
+				do -- // Right leg
+					local Positioning =
+						self.VirtualRig.RightLowerLeg.CFrame:Lerp(self.VirtualRig.RightFoot.CFrame, 0.5) *
+						CFrame.Angles(0, math.rad(180), 0) +
+						Vector3.new(0, 0.5, 0)
+					self.MoveRightLeg(Positioning)
+				end
+				do -- // Left leg
+					local Positioning =
+						self.VirtualRig.LeftLowerLeg.CFrame:Lerp(self.VirtualRig.LeftFoot.CFrame, 0.5) *
+						CFrame.Angles(0, math.rad(180), 0) +
+						Vector3.new(0, 0.5, 0)
+					self.MoveLeftLeg(Positioning)
+				end
+				
+				
+				-- // Head
+				self.MoveHead(self:ScaleCFrame(HeadCFrame, Scale))
+				
+				
+				
+				
 				
 				
 				-- // Set things up for next update
@@ -64,6 +104,7 @@ function RunModule.New(self)
 				self:UpdateChat(Delta)
 			else
 				self:EndUpdating()
+				Enabled = false
 			end
 		end)
 
@@ -79,6 +120,15 @@ function RunModule.New(self)
 				Character.HumanoidRootPart.CanCollide = true
 			end
 		end)
+		
+		
+		coroutine.wrap(function()
+			while Enabled do
+				self:FootYield()
+				self:UpdateFooting()
+				RunService.RenderStepped:Wait()
+			end
+		end)()
 	end
 	
 	function self:EndUpdating()
