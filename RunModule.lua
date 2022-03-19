@@ -22,7 +22,8 @@ function RunModule.New(self)
 			if Character then
 				local HeadCFrame, RightCFrame, LeftCFrame = self:GetUserCFrames()
 				local Scale = Camera.HeadScale
-
+				
+				Camera.CameraSubject = nil
 				Camera.CameraType = Enum.CameraType.Scriptable
 
 
@@ -43,7 +44,7 @@ function RunModule.New(self)
 				local HeightPosition = (self.VirtualBody.HumanoidRootPart.CFrame * CFrame.new(0,BaseHeight + math.clamp(Height, -2, 0.25),0)).p
 
 				Camera.CFrame = CFrame.new(HeightPosition) * self.Turn * self:GetHeadlockedCFrame()
-				self.VirtualBody.Humanoid:Move(self:VectorToCameraYSpace(self.MoveVector))
+				self.VirtualBody.Humanoid:Move(self:VectorToCameraYSpace(self.MoveVector), true)
 				
 				
 				
@@ -91,7 +92,7 @@ function RunModule.New(self)
 				
 				-- // Head
 				self.MoveHead(Camera.CFrame * self:ScaleCFrame(HeadCFrame, Scale))
-				
+				self.VirtualRig.Head.CFrame = Camera.CFrame * self:ScaleCFrame(HeadCFrame, Scale)
 				
 				
 				
@@ -126,24 +127,18 @@ function RunModule.New(self)
 			end
 		end)
 		
-		
-		coroutine.wrap(function()
+		spawn(function()
 			while Enabled do
 				self:FootYield()
 				self:UpdateFooting()
 			end
-		end)()
+		end)
 	end
 	
 	function self:EndUpdating()
 		self:Disconnect(RunString, "RunBind")
 		self:EndInputs()
 		self.Stepped = self:Disconnect(self.Stepped)
-
-		if self.CurrentSolver then
-			self.CurrentSolver:Terminate()
-			self.CurrentSolver = nil
-		end
 	end
 end
 

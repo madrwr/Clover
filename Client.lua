@@ -480,11 +480,9 @@ function Client.New()
 	
 
 	-- // Hide the main pointer
-	pcall(function()
-		VRService:RecenterUserHeadCFrame()
-		game.StarterGui:SetCore("VRLaserPointerMode", "Hidden")
-		game.StarterGui:SetCore("VREnableControllerModels", true)
-	end)
+	VRService:RecenterUserHeadCFrame()
+	game.StarterGui:SetCore("VRLaserPointerMode", "Hidden")
+	game.StarterGui:SetCore("VREnableControllerModels", true)
 end
 
 function Client:GetCharacter()
