@@ -135,11 +135,6 @@ function RunModule.New(self)
 		self:Disconnect(RunString, "RunBind")
 		self:EndInputs()
 		self.Stepped = self:Disconnect(self.Stepped)
-
-		if self.CurrentSolver then
-			self.CurrentSolver:Terminate()
-			self.CurrentSolver = nil
-		end
 	end
 end
 
