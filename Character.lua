@@ -73,7 +73,6 @@ function CreateAlignment(Limb, Anchor)
 		Motor:Destroy()
 	end
 	
-	Attachment0.Visible = true
 	return Attachment0
 end
 
@@ -329,7 +328,7 @@ function CharacterModule.SetUpBodies(VirtualRig, VirtualBody, CharacterCFrame)
 	--
 	VirtualBody.Parent = workspace
 	VirtualBody.Name = "VirtualBody"
-	VirtualBody.Humanoid.WalkSpeed = 8
+	VirtualBody.Humanoid.WalkSpeed = 10
 	VirtualBody:SetPrimaryPartCFrame(CharacterCFrame)
 	--
 	--Camera.CameraSubject = VirtualBody.Humanoid
@@ -441,6 +440,19 @@ function CharacterModule.SetUpCharacter()
 					Part.Enabled = false
 				end
 			)
+		end
+	end
+	
+	
+	for i,v in pairs(Character:GetDescendants()) do
+		if v:IsA("Motor6D") then
+			v:Destroy()
+		end
+	end
+
+	for i,v in pairs(CharacterModule.Reanimation:GetChildren()) do
+		if v:IsA("BasePart") then
+			v.Anchored = false
 		end
 	end
 end

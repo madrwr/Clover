@@ -14,7 +14,6 @@ function GetModule(module)
 	--return require(script.Parent:WaitForChild(module))
 end
 
-local Network = loadstring(game:HttpGet("https://pastebin.com/raw/bJms9qqM", true))()
 local CharacterModule = GetModule("Character")
 local Footing = GetModule("Footing")
 
@@ -22,6 +21,8 @@ local Footing = GetModule("Footing")
 -- Settings
 local AutoRun = false
 local ViewportEnabled = false
+local BodyVelocity = {-17.5, 0, -17.5}
+local HatVelocity = {-17.5, 0, -17.5}
 
 
 --
@@ -172,6 +173,21 @@ function Start()
 		
 		UpdateTorsoPosition()
 		UpdateLegPosition()
+		
+		
+		for _, Part in pairs(Character:GetChildren()) do
+			if Part:IsA("BasePart") then
+				Part.Velocity = Vector3.new(BodyVelocity[1], BodyVelocity[2], BodyVelocity[3])
+				Part.CFrame = Reanimation:FindFirstChild(Part.Name).CFrame
+			end
+
+			if Part:IsA("Accessory") then
+				if Part:FindFirstChild("Handle") and Reanimation:FindFirstChild(Part.Name):FindFirstChild("Handle") then
+					Part.Handle.Velocity = Vector3.new(HatVelocity[1], HatVelocity[2], HatVelocity[3])
+					Part.Handle.CFrame = Reanimation:FindFirstChild(Part.Name).Handle.CFrame
+				end
+			end
+		end
 	end)
 	
 	spawn(function()
@@ -243,6 +259,9 @@ function Start()
 	StarterGui:SetCore("VRLaserPointerMode", 3)
 	VRService:RecenterUserHeadCFrame()
 	
+	settings().Physics.AllowSleep = false 
+	settings().Physics.PhysicsEnvironmentalThrottle = Enum.EnviromentalPhysicsThrottle.Disabled
+	
 	
 	--
 	
@@ -252,5 +271,7 @@ function Start()
 	end
 end
 
-Network:Claim()
+
 Start()
+wait(9e16)
+return true
