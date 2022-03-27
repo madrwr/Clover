@@ -19,6 +19,7 @@ local Footing = GetModule("Footing")
 
 
 -- Settings
+local UseRepDummies = true
 local AutoRun = false
 local ViewportEnabled = false
 local BodyVelocity = {-17.5, 0, -17.5}
@@ -26,6 +27,49 @@ local HatVelocity = {-17.5, 0, -17.5}
 
 
 --
+
+
+
+
+local CameraAngle = CFrame.new()
+local WasdMove = Vector3.new()
+
+
+if not VRService.VREnabled then
+	local WasdTable = {
+		[Enum.KeyCode.W.Name] = 0,
+		[Enum.KeyCode.A.Name] = 0,
+		[Enum.KeyCode.S.Name] = 0,
+		[Enum.KeyCode.D.Name] = 0
+	}
+	
+	
+	local W = 0
+	local A = 0
+	local S = 0
+	local D = 0
+	
+	local TargetAngleX = 0
+	local TargetAngleY = 0
+	
+	ContextActionService:BindAction("GameMouseMovement", function(Name, State, Input)
+		if (State == Enum.UserInputState.Change or State == Enum.UserInputState.Begin) then
+			local Delta = Vector2.new(Input.Delta.X / 4, Input.Delta.Y / 4)
+			TargetAngleX = math.clamp(TargetAngleX - Delta.Y , -80, 80)
+			TargetAngleY = (TargetAngleY - Delta.X) % 360
+
+			CameraAngle = CFrame.Angles(0,math.rad(TargetAngleY),0) * CFrame.Angles(math.rad(TargetAngleX),0,0)
+		end
+
+		game:GetService("UserInputService").MouseIconEnabled = false
+		game:GetService("UserInputService").MouseBehavior = Enum.MouseBehavior.LockCenter
+	end, false, Enum.UserInputType.MouseMovement)
+
+	ContextActionService:BindAction("Wasd_ClovrVR", function(Name, State, Input)
+		WasdTable[Input.KeyCode.Name] = (State == Enum.UserInputState.Begin) and 1 or 0
+		WasdMove = Vector3.new(WasdTable[Enum.KeyCode.D.Name] - WasdTable[Enum.KeyCode.A.Name], 0, WasdTable[Enum.KeyCode.S.Name] - WasdTable[Enum.KeyCode.W.Name])
+	end, false, Enum.KeyCode.W, Enum.KeyCode.A, Enum.KeyCode.S, Enum.KeyCode.D)
+end
 
 
 
@@ -38,7 +82,7 @@ function Start()
 	Character:WaitForChild("Humanoid")
 	
 	local Reanimation = CharacterModule.CreateReanimation()
-	local VirtualRig, VirtualBody, Anchor = CharacterModule.GetBodies()
+	local VirtualRig, VirtualBody, Anchor = CharacterModule.GetBodies(UseRepDummies)
 	local Ignore = {VirtualRig, VirtualBody, Character, Camera, Anchor}
 	local CharacterCFrame = Character.HumanoidRootPart.CFrame
 	
@@ -152,7 +196,6 @@ function Start()
 
 		Camera.CameraSubject = nil
 		Camera.CameraType = Enum.CameraType.Scriptable
-		Camera.CFrame = (RootPosition * CFrame.new(0, UserCFrame.Y, 0) * Turn * GetHeadlockedCFrame())
 		
 		
 		
@@ -161,7 +204,14 @@ function Start()
 			ContextActionService:BindActivate(Enum.UserInputType.Gamepad1,Enum.KeyCode.ButtonR2)
 		end
 		
-		VirtualBody.Humanoid:Move(AngledVector(LeftThumbstick), true)
+		
+		if VRService.VREnabled then
+			Camera.CFrame = (RootPosition * CFrame.new(0, UserCFrame.Y, 0) * Turn * GetHeadlockedCFrame())
+			VirtualBody.Humanoid:Move(AngledVector(LeftThumbstick), true)
+		else
+			Camera.CFrame = RootPosition * CameraAngle
+			VirtualBody.Humanoid:Move(AngledVector(WasdMove), true)
+		end
 
 
 		LastUserPosition = UserCFrame.Position
@@ -224,7 +274,7 @@ function Start()
 		if State == Enum.UserInputState.Begin then
 			VirtualBody.Humanoid.Jump = true
 		end
-	end, false, Enum.KeyCode.ButtonA)
+	end, false, Enum.KeyCode.ButtonA, Enum.KeyCode.Space)
 	
 	
 	
