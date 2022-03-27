@@ -113,16 +113,28 @@ function Start()
 			VirtualRig.Head.CFrame = Positioning
 		elseif UserCFrame == Enum.UserCFrame.RightHand then
 			Positioning = Positioning * CFrame.new(0, 0, 1) * CFrame.Angles(math.rad(90), 0, 0)
-			MoveRightArm.WorldCFrame = (Positioning)
 			
 			VirtualRig.RightHand.CFrame = Positioning
 			VirtualRig.RightUpperArm.Aim.MaxTorque = Vector3.new(0, 0, 0)
+			
+			
+			if not VRService.VREnabled then
+				Positioning = VirtualRig.RightUpperArm.CFrame:Lerp(VirtualRig.RightLowerArm.CFrame, 0.5)
+			end
+			
+			MoveRightArm.WorldCFrame = (Positioning)
 		elseif UserCFrame == Enum.UserCFrame.LeftHand then
 			Positioning = Positioning * CFrame.new(0, 0, 1) * CFrame.Angles(math.rad(90), 0, 0)
-			MoveLeftArm.WorldCFrame = (Positioning)
 			
 			VirtualRig.LeftHand.CFrame = Positioning
 			VirtualRig.LeftUpperArm.Aim.MaxTorque = Vector3.new(0, 0, 0)
+			
+			
+			if not VRService.VREnabled then
+				Positioning = VirtualRig.LeftUpperArm.CFrame:Lerp(VirtualRig.LeftLowerArm.CFrame, 0.5)
+			end
+
+			MoveLeftArm.WorldCFrame = (Positioning)
 		end
 		
 		VirtualRig.RightHand.Anchored = true
@@ -211,6 +223,9 @@ function Start()
 		else
 			Camera.CFrame = RootPosition * CameraAngle
 			VirtualBody.Humanoid:Move(AngledVector(WasdMove), true)
+			
+			VirtualRig.RightUpperArm.ShoulderConstraint.RigidityEnabled = true
+			VirtualRig.LeftUpperArm.ShoulderConstraint.RigidityEnabled = true
 		end
 
 
@@ -275,6 +290,14 @@ function Start()
 			VirtualBody.Humanoid.Jump = true
 		end
 	end, false, Enum.KeyCode.ButtonA, Enum.KeyCode.Space)
+	
+	ContextActionService:BindAction("Run", function(Name, State, Input)
+		if State == Enum.UserInputState.Begin then
+			VirtualBody.Humanoid.WalkSpeed = 16
+		elseif State == Enum.UserInputState.End then
+			VirtualBody.Humanoid.WalkSpeed = 10
+		end
+	end, false, Enum.KeyCode.ButtonR2, Enum.KeyCode.LeftShift)
 	
 	
 	
