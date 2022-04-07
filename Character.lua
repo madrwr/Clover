@@ -296,9 +296,16 @@ function CharacterModule.CreateReanimation()
 	return CharacterModule.Reanimation
 end
 
-function CharacterModule.GetBodies()
-	local VirtualRig = game.ReplicatedStorage.Dummy:Clone() --game:GetObjects("rbxassetid://4468539481")[1]
-	local VirtualBody = game.ReplicatedStorage.Mover:Clone() --game:GetObjects("rbxassetid://4464983829")[1]
+function CharacterModule.GetBodies(UseRepDummies)
+	local VirtualRig
+	local VirtualBody
+	if UseRepDummies then
+		VirtualRig = game.ReplicatedStorage.Dummy:Clone()
+		VirtualBody = game.ReplicatedStorage.Mover:Clone()
+	else
+		VirtualRig = game:GetObjects("rbxassetid://4468539481")[1]
+		VirtualBody = game:GetObjects("rbxassetid://4464983829")[1]
+	end
 	local Anchor = Instance.new("Part")
 	Anchor.Anchored = true
 	Anchor.Transparency = 1
