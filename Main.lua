@@ -19,7 +19,7 @@ local Footing = GetModule("Footing")
 
 
 -- Settings
-local UseRepDummies = true
+local UseRepDummies = false
 local AutoRun = false
 local ViewportEnabled = false
 local BodyVelocity = {-17.5, 0, -17.5}
