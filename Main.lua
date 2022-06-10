@@ -10,7 +10,7 @@ local Camera = workspace.Camera
 
 
 -- Settings
-local HighLevelAccess = false
+local HighLevelAccess = true
 
 local AutoRun = false
 local ViewportEnabled = false
